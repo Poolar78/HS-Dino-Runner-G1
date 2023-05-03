@@ -21,6 +21,7 @@ class Dinosaur(Sprite):
         self.step = 0
         self.action = DINO_RUNNING
         self.jump_velociti = JUMP_VELOCITY
+        self.is_dead = False 
 
 
     def update(self , user_input):

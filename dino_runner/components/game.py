@@ -1,5 +1,6 @@
 import pygame
 from dino_runner.components.dinosaur import Dinosaur
+from dino_runner.components.game_over import GameOver
 from dino_runner.components.obstacles.obstacleManager import ObstacleManager
 from dino_runner.components.score import Score
 from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS , DINO_START
@@ -22,6 +23,9 @@ class Game:
         self.obstacle_manager = ObstacleManager()
         self.score = Score()
 
+        self.deaths = 0
+        self.game_over = None
+
     def run(self):
         self.running = True 
         while self.running:
@@ -37,6 +41,14 @@ class Game:
             self.update()
             self.draw()
 
+            if self.player.is_dead:
+                self.deaths += 1
+                self.game_over = GameOver(self.score.get_score(), self.deaths)
+                while True:
+                    self.handle_game_over_events()
+                    self.game_over.draw(self.screen)
+                    pygame.display.update()
+
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -45,7 +57,7 @@ class Game:
 
     def update(self):
         user_input = pygame.key.get_pressed()
-        self.player.update(user_input)
+        self.player.update(user_input)                 
         self.obstacle_manager.update(self)
         self.score.update(self)
 
@@ -94,3 +106,20 @@ class Game:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
                 self.play()
+
+
+    def handle_game_over_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.playing = False
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.reset_game()
+    
+    def reset_game(self):
+        self.player.reset()
+        self.obstacle_manager.reset()
+        self.score.reset()
+        self.game_over = None
+    
