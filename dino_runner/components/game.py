@@ -22,9 +22,7 @@ class Game:
         self.player = Dinosaur()
         self.obstacle_manager = ObstacleManager()
         self.score = Score()
-
-        self.deaths = 0
-        self.game_over = None
+        self.game_over = GameOver(score=0, deaths=0)
 
     def run(self):
         self.running = True 
@@ -40,14 +38,10 @@ class Game:
             self.events()
             self.update()
             self.draw()
-
-            if self.player.is_dead:
-                self.deaths += 1
-                self.game_over = GameOver(self.score.get_score(), self.deaths)
-                while True:
-                    self.handle_game_over_events()
-                    self.game_over.draw(self.screen)
-                    pygame.display.update()
+        self.game_over.score = self.score.score
+        self.game_over.deaths = self.score.deaths
+        self.game_over.run()
+        self.play()
 
     def events(self):
         for event in pygame.event.get():
@@ -57,7 +51,7 @@ class Game:
 
     def update(self):
         user_input = pygame.key.get_pressed()
-        self.player.update(user_input)                 
+        self.player.update(user_input)
         self.obstacle_manager.update(self)
         self.score.update(self)
 
@@ -84,19 +78,14 @@ class Game:
     def show_menu(self):
         center_x = SCREEN_WIDTH // 2 
         center_y = SCREEN_HEIGHT // 2
-        #cambiar fondo de pantalla ,
-        self.screen.fill((255, 255, 255))  
-        #agrgar un texto de inicio en la pantalla 
+        self.screen.fill((255, 255, 255))   
         font = pygame.font.Font('freesansbold.ttf', 30)
         text = font.render("press any key to start.", True, (0,0,0))
         text_rect = text.get_rect()
         text_rect.center = (center_x , center_y)
         self.screen.blit(text, text_rect)
-        #agregar una imagen en la pantalla
         self.screen.blit(DINO_START, (center_x -49 ,center_y - 121))
-        #refrescar pantalla
         pygame.display.update()
-        #manejar eventos
         self.handle_menu_events()
         
 
@@ -106,20 +95,3 @@ class Game:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
                 self.play()
-
-
-    def handle_game_over_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.playing = False
-                self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    self.reset_game()
-    
-    def reset_game(self):
-        self.player.reset()
-        self.obstacle_manager.reset()
-        self.score.reset()
-        self.game_over = None
-    
