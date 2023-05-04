@@ -3,8 +3,8 @@ from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.game_over import GameOver
 from dino_runner.components.obstacles.obstacleManager import ObstacleManager
 from dino_runner.components.score import Score
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS , DINO_START
-
+from dino_runner.utils.constants import BG, HAMMER_TYPE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, TITLE, FPS , DINO_START
+from dino_runner.components.power_ups import power_up_manager 
 
 class Game:
     def __init__(self):
@@ -23,6 +23,7 @@ class Game:
         self.obstacle_manager = ObstacleManager()
         self.score = Score()
         self.game_over = GameOver(score=0, deaths=0)
+        self.power_up_manager = power_up_manager.PowerUpManager()
 
     def run(self):
         self.running = True 
@@ -33,9 +34,7 @@ class Game:
 
     def play(self):
         # Game loop: events - update - draw
-        self.playing = True
-        self.obstacle_manager.reset()
-        self.score.reset()
+        self.reset_game()
         while self.playing: 
             self.events()
             self.update()
@@ -43,6 +42,11 @@ class Game:
         self.game_over.score = self.score.score
         self.game_over.deaths = self.score.deaths
         
+    def reset_game(self):
+        self.playing = True
+        self.obstacle_manager.reset()
+        self.score.reset()
+        self.power_up_manager.reset()
 
 
     def events(self):
@@ -56,6 +60,7 @@ class Game:
         self.player.update(user_input)
         self.obstacle_manager.update(self.game_speed, self.player, self.on_death)
         self.score.update(self)
+        self.power_up_manager.update(self.game_speed, self.score.score , self.player)
 
     def draw(self):
         self.clock.tick(FPS)
@@ -64,6 +69,8 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.score.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
+        self.player.draw_power_up(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
@@ -80,9 +87,11 @@ class Game:
 
     def on_death(self):
         print("BOOOOOOOOM")
-        pygame.time.delay(500)
-        self.playing = False
-        self.score.deaths += 1
+        is_invincible = self.player.type == SHIELD_TYPE or self.player.type == HAMMER_TYPE
+        if not is_invincible:
+            pygame.time.delay(500)
+            self.playing = False
+            self.score.deaths += 1
 
             
 
