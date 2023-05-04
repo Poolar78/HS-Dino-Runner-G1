@@ -34,14 +34,16 @@ class Game:
     def play(self):
         # Game loop: events - update - draw
         self.playing = True
+        self.obstacle_manager.reset()
+        self.score.reset()
         while self.playing: 
             self.events()
             self.update()
             self.draw()
         self.game_over.score = self.score.score
         self.game_over.deaths = self.score.deaths
-        self.game_over.run()
-        self.play()
+        
+
 
     def events(self):
         for event in pygame.event.get():
@@ -52,7 +54,7 @@ class Game:
     def update(self):
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
-        self.obstacle_manager.update(self)
+        self.obstacle_manager.update(self.game_speed, self.player, self.on_death)
         self.score.update(self)
 
     def draw(self):
@@ -75,18 +77,30 @@ class Game:
             self.x_pos_bg = 0
         self.x_pos_bg -= self.game_speed
 
+
+    def on_death(self):
+        print("BOOOOOOOOM")
+        pygame.time.delay(500)
+        self.playing = False
+        self.score.deaths += 1
+
+            
+
     def show_menu(self):
-        center_x = SCREEN_WIDTH // 2 
-        center_y = SCREEN_HEIGHT // 2
-        self.screen.fill((255, 255, 255))   
-        font = pygame.font.Font('freesansbold.ttf', 30)
-        text = font.render("press any key to start.", True, (0,0,0))
-        text_rect = text.get_rect()
-        text_rect.center = (center_x , center_y)
-        self.screen.blit(text, text_rect)
-        self.screen.blit(DINO_START, (center_x -49 ,center_y - 121))
-        pygame.display.update()
-        self.handle_menu_events()
+        if self.score.deaths == 0:
+            center_x = SCREEN_WIDTH // 2 
+            center_y = SCREEN_HEIGHT // 2
+            self.screen.fill((255, 255, 255))   
+            font = pygame.font.Font('freesansbold.ttf', 30)
+            text = font.render("press any key to start.", True, (0,0,0))
+            text_rect = text.get_rect()
+            text_rect.center = (center_x , center_y)
+            self.screen.blit(text, text_rect)
+            self.screen.blit(DINO_START, (center_x -49 ,center_y - 121))
+            pygame.display.update()
+            self.handle_menu_events()
+        else:
+            self.game_over.draw(self)
         
 
     def handle_menu_events(self):

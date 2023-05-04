@@ -13,7 +13,10 @@ class Score:
     
     def draw(self, screen):
         font = pygame.font.Font('freesansbold.ttf', 22)
-        text = font.render(f"Score: {self.score}, Deaths: {self.deaths}", True, (0,0,0))
+        text = font.render(f"Score: {self.score}, Deaths: {self.deaths} ", True, (0,0,0))
         text_rect = text.get_rect()
         text_rect.center = (900 , 50)
         screen.blit(text, text_rect)
+
+    def reset(self):
+        self.score = 0
