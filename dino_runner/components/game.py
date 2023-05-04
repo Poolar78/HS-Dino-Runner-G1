@@ -24,6 +24,9 @@ class Game:
         self.score = Score()
         self.game_over = GameOver(score=0, deaths=0)
         self.power_up_manager = power_up_manager.PowerUpManager()
+        self.jump_sound = pygame.mixer.Sound("death_sound.mp3")
+        pygame.mixer.music.set_volume(0.2)
+
 
     def run(self):
         self.running = True 
@@ -33,7 +36,6 @@ class Game:
         pygame.quit()
 
     def play(self):
-        # Game loop: events - update - draw
         self.reset_game()
         while self.playing: 
             self.events()
@@ -92,6 +94,9 @@ class Game:
             pygame.time.delay(500)
             self.playing = False
             self.score.deaths += 1
+            death_sound = pygame.mixer.Sound("death_sound.mp3")
+            death_sound.play()
+
 
             
 

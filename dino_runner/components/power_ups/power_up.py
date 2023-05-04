@@ -12,12 +12,19 @@ class PowerUp:
         self.rect = self.image.get_rect()
         self.rect.x = SCREEN_WIDTH + random.randint(800, 1000)
         self.rect.y = random.randint(100, 150)
+        self.jump_sound = pygame.mixer.Sound("duration.mp3")
+        pygame.mixer.music.set_volume(0.2)
 
         self.start_time = 0
         if self.type == "shield":
             self.duration = random.randint(3, 5)
+            sound = pygame.mixer.Sound("duration.mp3")
+            sound.play()
+        
         elif self.type == "hammer":
             self.duration = 3
+            sound = pygame.mixer.Sound("duration.mp3")
+            sound.play()
 
     def update(self, game_speed, power_ups):
         self.rect.x -= game_speed

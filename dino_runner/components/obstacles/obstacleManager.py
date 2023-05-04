@@ -8,7 +8,7 @@ class ObstacleManager:
     
     def __init__(self):
         self.obstacles = []
-        
+
 
     
     def update(self, game_speed, player, on_death):
